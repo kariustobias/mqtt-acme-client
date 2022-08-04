@@ -13,8 +13,12 @@ func Initialize(broker string, endpoint string) error {
 	}
 	//subscribe
 	err = subscribe(endpoint, client)
+	if err != nil {
+		return err
+	}
 
 	//publish on GetDirectory
+	return nil
 }
 
 func connectToBroker(broker string) (MQTT.Client, error) {
