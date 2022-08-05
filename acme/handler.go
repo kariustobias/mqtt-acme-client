@@ -6,24 +6,24 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
 
-func Initialize(broker string, endpoint string) error {
+func Initialize(broker string, endpoint string) (MQTT.Client, error) {
 	client, err := connectToBroker(broker)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	//subscribe
 	err = subscribe(endpoint, client)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	//publish on GetDirectory
-	return nil
+	return client, nil
 }
 
 func connectToBroker(broker string) (MQTT.Client, error) {
 	opts := MQTT.NewClientOptions().AddBroker(broker)
-	opts.SetClientID("Device-sub")
+	opts.SetClientID("acme-client")
 	opts.SetDefaultPublishHandler(f)
 
 	//create and start a client using the above ClientOptions

@@ -7,7 +7,7 @@ import (
 func main() {
 
 	// publish GETDirectory json on /acme/server endpoint
-	acme.Initialize("tcp://localhost:1883", "/acme/client")
+	client, _ := acme.Initialize("tcp://localhost:1883", "/acme/client")
 	// publish GetDirectory request. All further requests will be handled by the handler
-	acme.GetDirectory()
+	acme.GetDirectory(client)
 }
