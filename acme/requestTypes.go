@@ -17,6 +17,10 @@ type NewOrderReq struct {
 	Identifiers []Identifier `json:"identifiers"`
 }
 
+type FinalizeReq struct {
+	CSR string `json:"csr"`
+}
+
 type Identifier struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`

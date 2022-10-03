@@ -55,10 +55,12 @@ func (n *Manager) Nonce() (string, error) {
 func (n *Manager) GetAndPushFromResponse(msg MQTT.Message) {
 	// parse replay-nonce out of message
 	var nonce NewNonceResp
+	fmt.Printf("GetAndPushFromResponse msg payload: %s\n", string(msg.Payload()))
 	err := json.Unmarshal(msg.Payload(), &nonce)
 	if err != nil {
 		fmt.Printf("Error parsing new-nonce response\n")
 	}
 	//push nonce on NonceManager
+	fmt.Printf("GetAndPushFromResponse : %s\n", nonce.ReplayNonce)
 	n.Push(nonce.ReplayNonce)
 }

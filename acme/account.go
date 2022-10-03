@@ -3,6 +3,7 @@ package acme
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
@@ -13,7 +14,7 @@ func HandleNewAccountRequest(client MQTT.Client, path string, jws *JWS) []byte {
 	// create Account object
 	payload := NewAccountReq{
 		TermsOfServiceAgreed: true,
-		Contact:              []string{"mailto:tobias.karius@yahoo.de"},
+		Contact:              []string{"mailto:test@test.test"},
 	}
 	payloadBytes, _ := json.Marshal(payload)
 
@@ -34,5 +35,5 @@ func HandleNewAccountResponse(core *Core, msg MQTT.Message) {
 		fmt.Printf("couldn't parse msg into NewAccountResp %s\n", err.Error())
 	}
 	// 2. set kid
-	core.jws.kid = accountResponse.Orders
+	core.jws.kid = strings.ReplaceAll(accountResponse.Orders, "/orders", "")
 }

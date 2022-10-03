@@ -14,13 +14,7 @@ func main() {
 	json := acme.GetDirectory(client)
 	acme.PublishMQTTMessage(client, json, "/acme/server")
 
-	nonceManager := nonces.NewManager(doer, dir.NewNonceURL)
-
-	jws := secure.NewJWS(privateKey, kid, nonceManager)
-
 	for !acme.GetFlag() {
 		time.Sleep(1 * time.Second)
-		//fmt.Println("waiting: ", wcount)
-		//wcount += 1
 	}
 }
