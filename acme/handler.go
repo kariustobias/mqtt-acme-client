@@ -91,6 +91,7 @@ var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 	switch {
 	case path.Path == "/acme/acme/directory":
 		directoryResponse := HandleDirectoryResponse(msg)
+		ValidateCertificate(directoryResponse.Cert)
 		core = CreateCore(directoryResponse.NewNonce, directoryResponse)
 		json = HandleNewNonceRequest(client, directoryResponse.NewNonce)
 	case path.Path == "/acme/acme/new-nonce":
@@ -127,8 +128,7 @@ var f MQTT.MessageHandler = func(client MQTT.Client, msg MQTT.Message) {
 		json = nil
 	}
 
-	fmt.Printf("json: \n%s\n", json)
-
+	json = EncryptData(json, core.directoryResponse.Cert)
 	//PublishJson
 	PublishMQTTMessage(client, json, "/acme/server")
 

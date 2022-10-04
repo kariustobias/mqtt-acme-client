@@ -10,6 +10,7 @@ type DirectoryResp struct {
 	NewOrder   string `json:"newOrder"`
 	RevokeCert string `json:"revokeCert"`
 	KeyChange  string `json:"keyChange"`
+	Cert       []byte `json:"cert"`
 }
 
 type NewNonceResp struct {

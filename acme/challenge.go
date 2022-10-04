@@ -16,25 +16,16 @@ import (
 	"math/big"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/fxamacker/cbor/v2"
 	"github.com/google/go-attestation/attest"
-
-	x509ext "github.com/google/go-attestation/x509"
 	"github.com/google/go-tpm-tools/simulator"
 	"golang.org/x/crypto/acme"
 )
 
-type simulatorChannel struct {
-	io.ReadWriteCloser
-}
-
-func (simulatorChannel) MeasurementLog() ([]byte, error) {
-	return nil, errors.New("not implemented")
-}
-
 func HandleGetChallengeRequest(path string, jws *JWS, publicKey rsa.PublicKey) []byte {
 	fmt.Printf("HandleNewChallengeRequest\n")
 
-	DeviceAttest01Challenge(publicKey)
+	//DeviceAttest01Challenge(publicKey)
 
 	var payloadBytes = []byte{}
 
@@ -56,6 +47,14 @@ func HandleGetAndValidateChallengeResponse(msg MQTT.Message) *NewChallengeResp {
 		fmt.Printf("unexpected challenge status. Expected : valid, Got : %s\n", chall.Status)
 	}
 	return &chall
+}
+
+type simulatorChannel struct {
+	io.ReadWriteCloser
+}
+
+func (simulatorChannel) MeasurementLog() ([]byte, error) {
+	return nil, errors.New("not implemented")
 }
 
 func DeviceAttest01Challenge(useSimulator bool, publicKey rsa.PublicKey, token string) error {
@@ -124,7 +123,24 @@ func tpmInit(useSimulator bool) (*attest.TPM, *attest.AK, []byte, error) {
 }
 
 func attestationStatement(key *attest.Key, akCert []byte) ([]byte, error) {
+	params := key.CertificationParameters()
 
+	obj := &AttestationObject{
+		Format: "tpm",
+		AttStatement: map[string]interface{}{
+			"ver":      "2.0",
+			"alg":      int64(-257), // AlgRS256
+			"x5c":      []interface{}{akCert},
+			"sig":      params.CreateSignature,
+			"certInfo": params.CreateAttestation,
+			"pubArea":  params.Public,
+		},
+	}
+	b, err := cbor.Marshal(obj)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 // Borrowed from:
